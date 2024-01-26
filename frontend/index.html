@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form id="pdfForm" enctype="multipart/form-data">
+      <input type="file" id="pdfFile" accept=".pdf" required />
+      <input type="file" id="imageFile" accept="image/*" required />
+      <label for="height">Height:</label>
+      <input type="number" id="height" required />
+      <label for="width">Width:</label>
+      <input type="number" id="width" required />
+      <label for="x">X:</label>
+      <input type="number" id="x" required />
+      <label for="y">Y:</label>
+      <input type="number" id="y" required />
+      <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+    <script>
+      function submitForm() {
+        const pdfFileInput = document.getElementById("pdfFile");
+        const imageFileInput = document.getElementById("imageFile");
+        const height = document.getElementById("height").value;
+        const width = document.getElementById("width").value;
+        const x = document.getElementById("x").value;
+        const y = document.getElementById("y").value;
+
+        const formData = new FormData();
+        formData.append("pdfFile", pdfFileInput.files[0]);
+        formData.append("imageFile", imageFileInput.files[0]);
+        formData.append("height", height);
+        formData.append("width", width);
+        formData.append("x", x);
+        formData.append("y", y);
+
+        fetch("http://localhost:3000/api/process-pdf", {
+          method: "POST",
+          body: formData,
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Server responded with status ${response.status}`
+              );
+            }
+
+            return response.blob();
+          })
+          .then((blob) => {
+            // Create a download link
+            console.log(blob);
+          })
+          .catch((error) => {
+            console.error("Error:", error.message);
+            // Handle the error, show a message to the user, etc.
+          });
+      }
+    </script>
+  </body>
+</html>
